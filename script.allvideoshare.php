@@ -197,6 +197,11 @@ class COM_AllVideoShareInstallerScript {
 			$db->setQuery($query);
 			$db->query();
 		}
+		if(array_key_exists('comments_type', $fields_config)) {
+			$query = "ALTER TABLE #__allvideoshare_config MODIFY COLUMN `comments_type` VARCHAR(50) NOT NULL DEFAULT '' AFTER `search`";
+			$db->setQuery($query);
+			$db->query();
+		}
 		
 		// Remove old version files		
 		if (JFile::exists(JPATH_ADMINISTRATOR.'/components/com_allvideoshare/tables/allvideosharecategories.php')) {

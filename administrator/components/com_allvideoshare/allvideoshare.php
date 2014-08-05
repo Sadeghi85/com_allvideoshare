@@ -11,11 +11,11 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Register Libraries
-JLoader::register('AllVideoShareCommercial', JPATH_COMPONENT.'/etc/commercial.php');
+//JLoader::register('AllVideoShareCommercial', JPATH_COMPONENT.'/etc/commercial.php');
 JLoader::register('AllVideoShareFallback', JPATH_COMPONENT.'/etc/fallback.php');
 JLoader::register('AllVideoShareUtils', JPATH_COMPONENT.'/etc/utils.php');
 
-AllVideoShareCommercial::insertLicense();
+//AllVideoShareCommercial::insertLicense();
 
 // CSS
 $document = JFactory::getDocument();
