@@ -11,16 +11,21 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Register Libraries
+JLoader::register('AllVideoShareCommercial', JPATH_COMPONENT.'/etc/commercial.php');
 JLoader::register('AllVideoShareFallback', JPATH_COMPONENT.'/etc/fallback.php');
 JLoader::register('AllVideoShareUtils', JPATH_COMPONENT.'/etc/utils.php');
+
+AllVideoShareCommercial::insertLicense();
 
 // CSS
 $document = JFactory::getDocument();
 if(version_compare(JVERSION, '3.0', 'ge')) {
-	$document->addStyleSheet( JURI::base().'components/com_allvideoshare/css/allvideoshare.j3.css' );	
+	//$document->addStyleSheet( JURI::base().'components/com_allvideoshare/css/allvideoshare.j3.css?r='.rand() );
+	$document->addStyleSheet( JURI::base().'components/com_allvideoshare/css/allvideoshare.j3.css');
 	define('ALLVIDEOSHARE_JVERSION', '3.0');
 } else {
-	$document->addStyleSheet( JURI::base().'components/com_allvideoshare/css/allvideoshare.css' );
+	//$document->addStyleSheet( JURI::base().'components/com_allvideoshare/css/allvideoshare.css?r='.rand() );
+	$document->addStyleSheet( JURI::base().'components/com_allvideoshare/css/allvideoshare.css');
 	define('ALLVIDEOSHARE_JVERSION', '');
 }
 

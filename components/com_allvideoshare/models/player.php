@@ -94,13 +94,16 @@ class AllVideoShareModelPlayer extends AllVideoShareModel {
 		 $className = $this->responsive ? 'avs_player_responsive' : 'avs_player';
 		 $result  = '<div class="'.$className.'">';
 		 $result .= '<object id="player" name="player" width="' . $this->width . '" height="' . $this->height . '">';
-    	 $result .= '<param name="movie" value="' . JURI::root() . 'components/com_allvideoshare/player.swf" />';
+//    	 $result .= '<param name="movie" value="' . JURI::root() . 'components/com_allvideoshare/player.swf?random=' . rand() . '" />';
+		$result .= '<param name="movie" value="' . JURI::root() . 'components/com_allvideoshare/player.swf" />';
     	 $result .= '<param name="wmode" value="opaque" />';
     	 $result .= '<param name="allowfullscreen" value="true" />';
     	 $result .= '<param name="allowscriptaccess" value="always" />';
     	 $result .= '<param name="flashvars" value="' . $flashvars . '" />';
-    	 $result .= '<object type="application/x-shockwave-flash" data="' . JURI::root() . 'components/com_allvideoshare/player.swf" width="' . $this->width . '" height="' . $this->height . '">';
-      	 $result .= '<param name="movie" value="' . JURI::root() . 'components/com_allvideoshare/player.swf" />';
+    	 //$result .= '<object type="application/x-shockwave-flash" data="' . JURI::root() . 'components/com_allvideoshare/player.swf?random=' . rand() . '" width="' . $this->width . '" height="' . $this->height . '">';
+		 $result .= '<object type="application/x-shockwave-flash" data="' . JURI::root() . 'components/com_allvideoshare/player.swf" width="' . $this->width . '" height="' . $this->height . '">';
+      	 //$result .= '<param name="movie" value="' . JURI::root() . 'components/com_allvideoshare/player.swf?random=' . rand() . '" />';
+		 $result .= '<param name="movie" value="' . JURI::root() . 'components/com_allvideoshare/player.swf" />';
       	 $result .= '<param name="wmode" value="opaque" />';
       	 $result .= '<param name="allowfullscreen" value="true" />';
       	 $result .= '<param name="allowscriptaccess" value="always" />';
@@ -160,7 +163,7 @@ class AllVideoShareModelPlayer extends AllVideoShareModel {
 	}
 	
 	function buildCustomMeta( $player, $video ) {
-		 $swf = JURI::root().'components/com_allvideoshare/player.swf?autoStart=true';
+		 $swf = JURI::root().'components/com_allvideoshare/player.swf?autoStart=true&random=' . rand();
 		 $swf .= '&base='.urlencode( JURI::root() ).'&vid=' . $video->id . '&pid=' . $player->id;
 		 
 		 $doc = JFactory::getDocument();

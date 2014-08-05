@@ -8,6 +8,10 @@
 */
 
 defined('_JEXEC') or die('Restricted access');
+
+
+//$document = JFactory::getDocument();
+//$document->addCustomTag('<script src="'.Juri::base() . 'components/com_allvideoshare/js/jquery.form.min.js" type="text/javascript"></script>');
 ?>
 
 <div id="avs">
@@ -54,6 +58,37 @@ defined('_JEXEC') or die('Restricted access');
         <td class="avskey"><?php echo JText::_('PREVIEW'); ?></td>
         <td><input type="text" name="preview" size="60" /></td>
       </tr>
+	  
+	  <tr id="data_cdn_url">
+        <td class="avskey"><?php echo JText::_('CDN_URL'); ?></td>
+        <td><input type="text" name="cdn_url" size="60" value="<?php echo $this->cdn['cdn_url']; ?>" /></td>
+      </tr>
+	  <tr id="data_cdn_username">
+        <td class="avskey"><?php echo JText::_('CDN_USERNAME'); ?></td>
+        <td><input type="text" name="cdn_username" size="60" value="<?php echo $this->cdn['cdn_username']; ?>" /></td>
+      </tr>
+	  <tr id="data_cdn_password">
+        <td class="avskey"><?php echo JText::_('CDN_PASSWORD'); ?></td>
+        <td><input type="password" name="cdn_password" size="60" value="<?php echo $this->cdn['cdn_password']; ?>" /></td>
+      </tr>
+	  <tr id="upload_cdn_video">
+        <td class="avskey"><?php echo JText::_('VIDEO'); ?></td>
+        <td><input type="file" name="cdn_video" maxlength="100" /></td>
+      </tr>
+      <tr id="upload_cdn_thumb">
+        <td class="avskey"><?php echo JText::_('THUMB'); ?></td>
+        <td><input type="file" name="cdn_thumb" maxlength="100" /></td>
+      </tr>
+      <tr id="upload_cdn_preview">
+        <td class="avskey"><?php echo JText::_('PREVIEW'); ?></td>
+        <td><input type="file" name="cdn_preview" maxlength="100" /></td>
+      </tr>
+	  
+	  
+	  
+	  
+	  
+	  
       <tr id="upload_data_video">
         <td class="avskey"><?php echo JText::_('VIDEO'); ?></td>
         <td><input type="file" name="upload_video" maxlength="100" /></td>
@@ -135,13 +170,72 @@ if(<?php echo substr(JVERSION,0,3); ?> != '1.5') {
 	Joomla.submitbutton = submitbutton;
 }
 	
-function submitbutton(pressbutton){ 	
-	if(pressbutton == 'save' || pressbutton == 'apply') {	
+function submitbutton(pressbutton){
+	if(pressbutton == 'save' || pressbutton == 'apply') {
 		if(valForm() == false) return;
+	
+	
+		var method = type.options[type.selectedIndex].value;
+		
+		if(method == 'cdn_upload') {
+		
+			// Create a new FormData object.
+			var formData = new FormData(document.forms.namedItem("adminForm"));
+			// Set up the request.
+			var xhr = new XMLHttpRequest();
+			// Open the connection.
+			xhr.open('POST', document.getElementsByName('cdn_url')[0].value, true);
+			// Set header so the called script knows that it's an XMLHttpRequest
+			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+			// Set up a handler for when the request finishes.
+			xhr.onload = function () {
+			  if (xhr.status === 200) {
+				// File(s) uploaded.
+				var response = JSON.parse(xhr.responseText);
+				
+				if (response.hasOwnProperty('success') && response.hasOwnProperty('video') && response.hasOwnProperty('thumb') && response.hasOwnProperty('preview') && response.success == 1)
+				{
+					document.getElementsByName('video')[0].value = response.video;
+					document.getElementsByName('thumb')[0].value = response.thumb;
+					document.getElementsByName('preview')[0].value = response.preview;
+					document.getElementsByName('type')[0].value = 'lighttpd';
+					document.getElementsByName('cdn_video')[0].value = '';
+					document.getElementsByName('cdn_thumb')[0].value = '';
+					document.getElementsByName('cdn_preview')[0].value = '';
+					
+					submitform( pressbutton );	
+					return;
+				}
+				else
+				{
+					alert('<?php echo JText::_( 'CDN_UPLOAD_FAILED', true); ?>');
+					return;
+				}
+				
+			  } else {
+				alert('<?php echo JText::_( 'CDN_UPLOAD_FAILED', true); ?>');
+				return;
+			  }
+			};
+			// Send the Data.
+			xhr.send(formData);
+			 
+		}
+		else
+		{
+			submitform( pressbutton );	
+			return;
+		}
 	}
-	submitform( pressbutton );	
-	return;
+	else
+	{
+		submitform( pressbutton );	
+		return;
+	}
+	
+	
 }
+
 
 function valForm() {
 	var method = type.options[type.selectedIndex].value;
@@ -151,7 +245,36 @@ function valForm() {
        	return false;
 	}
 	
-	if(method == 'upload') {
+	if(method == 'cdn_upload') {
+		if(form.cdn_url.value == '') {
+			alert( "<?php echo JText::_( 'CDN_URL_FIELD_SHOULD_NOT_BE_EMPTY', true); ?>" );
+			return false;
+		}
+		if(form.cdn_username.value == '') {
+			alert( "<?php echo JText::_( 'CDN_USERNAME_FIELD_SHOULD_NOT_BE_EMPTY', true); ?>" );
+			return false;
+		}
+		if(form.cdn_password.value == '') {
+			alert( "<?php echo JText::_( 'CDN_PASSWORD_FIELD_SHOULD_NOT_BE_EMPTY', true); ?>" );
+			return false;
+		}
+		if(form.cdn_video.value == '') {
+       		alert( "<?php echo JText::_( 'YOU_MUST_ADD_A_VIDEO', true); ?>" );
+       		return false;
+	    } else {
+			isAllowed = checkExtension('VIDEO', form.cdn_video.value, videoExtensions);
+			if(isAllowed == false) 	return false;
+		}
+		if(form.cdn_thumb.value) {
+       		isAllowed = checkExtension('THUMB', form.cdn_thumb.value, imageExtensions);
+			if(isAllowed == false) 	return false;
+		}
+		if(form.cdn_preview.value) {
+			isAllowed = checkExtension('PREVIEW', form.cdn_preview.value, imageExtensions);
+			if(isAllowed == false) 	return false;
+		}
+	}
+	else if(method == 'upload') {
 		if(form.upload_video.value == '') {
        		alert( "<?php echo JText::_( 'YOU_MUST_ADD_A_VIDEO', true); ?>" );
        		return false;
@@ -229,6 +352,15 @@ function checkExtension(type, filePath, validExtensions) {
 }
 
 function changeType(typ) {
+
+	
+	document.getElementById('data_cdn_url').style.display               = "none";
+	document.getElementById('data_cdn_username').style.display           = "none";
+	document.getElementById('data_cdn_password').style.display           = "none";
+	document.getElementById('upload_cdn_video').style.display           = "none";
+	document.getElementById('upload_cdn_thumb').style.display           = "none";
+	document.getElementById('upload_cdn_preview').style.display         = "none";
+	
 	document.getElementById('url_data_video').style.display              = "none";
 	document.getElementById('url_data_hd').style.display                 = "none";
 	document.getElementById('url_data_thumb').style.display              = "none";
@@ -249,6 +381,17 @@ function changeType(typ) {
 			document.getElementById('url_data_thumb').style.display      = "";
 			document.getElementById('url_data_preview').style.display    = "";
 			break;
+			
+		case 'cdn_upload':
+			
+			document.getElementById('data_cdn_url').style.display       = "";
+			document.getElementById('data_cdn_username').style.display   = "";
+			document.getElementById('data_cdn_password').style.display   = "";
+			document.getElementById('upload_cdn_video').style.display   = "";
+			document.getElementById('upload_cdn_thumb').style.display   = "";
+			document.getElementById('upload_cdn_preview').style.display = "";
+			break;
+			
 		case 'upload':
 			document.getElementById('upload_data_video').style.display   = "";
 			document.getElementById('upload_data_hd').style.display      = "";
@@ -282,4 +425,6 @@ function changeType(typ) {
 			break;
 	}	
 }
+
+
 </script>

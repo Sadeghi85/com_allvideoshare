@@ -175,6 +175,15 @@ class AllVideoShareModelVideos extends AllVideoShareModel {
 	}
 	
 	function save() {
+	
+		if (($cdn_url = JRequest::getVar('cdn_url', '', 'post')) and ($cdn_username = JRequest::getVar('cdn_username', '', 'post')) and ($cdn_password = JRequest::getVar('cdn_password', '', 'post')))
+		{
+			$db = JFactory::getDBO();
+			$query = sprintf('UPDATE #__allvideoshare_config SET cdn_url = \'%s\', cdn_username = \'%s\', cdn_password = \'%s\' WHERE id = 1', $cdn_url, $cdn_username, base64_encode(str_rot13(base64_encode(str_rot13(base64_encode($cdn_password))))));
+			$db->setQuery( $query );
+			@$db->query();
+		}
+	
 		 $mainframe = JFactory::getApplication();
 	  	 $row = JTable::getInstance('Videos', 'AllVideoShareTable');
 	  	 $cid = JRequest::getVar( 'cid', array(0), '', 'array' );
@@ -193,8 +202,8 @@ class AllVideoShareModelVideos extends AllVideoShareModel {
 	  	 $row->description = JRequest::getVar('description', '', 'post', 'string', JREQUEST_ALLOWHTML);
 		 $row->thirdparty  = JRequest::getVar('thirdparty', '', 'post', 'string', JREQUEST_ALLOWRAW);
 	  
-	  	 if($row->type == 'upload') {		
-			$dir = JFilterOutput::stringURLSafe( $row->category );	
+	  	 if($row->type == 'upload') {
+			$dir = JFilterOutput::stringURLSafe( $row->category );
 		 	if(!JFolder::exists(ALLVIDEOSHARE_UPLOAD_BASE . $dir . DS)) {
 				JFolder::create(ALLVIDEOSHARE_UPLOAD_BASE . $dir . DS);
 			}
@@ -226,7 +235,7 @@ class AllVideoShareModelVideos extends AllVideoShareModel {
 		 }
 	  
 	  	 if(!$row->thumb && !JRequest::getCmd('upload_thumb')) {
-			$row->thumb = JURI::root().'components/com_allvideoshare/assets/default.jpg';
+			$row->thumb = 'http://img.youtube.com/vi/default.jpg';
 		 }
 		
 		 $row->reorder( "category='" . $row->category . "'" );
@@ -272,6 +281,15 @@ class AllVideoShareModelVideos extends AllVideoShareModel {
     	}
 		
     	return $video_id;
+	}
+	
+	function getcdn() {
+		 $db = JFactory::getDBO();
+		 $query = 'SELECT cdn_url, cdn_username, cdn_password FROM #__allvideoshare_config WHERE id = 1';
+		 $db->setQuery( $query );
+		 $cdn = $db->loadAssoc();
+		 $cdn['cdn_password'] = base64_decode(str_rot13(base64_decode(str_rot13(base64_decode($cdn['cdn_password'])))));
+		 return $cdn;
 	}
 	
 	function cancel() {

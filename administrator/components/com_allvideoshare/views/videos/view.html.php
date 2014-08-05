@@ -68,6 +68,7 @@ class AllVideoShareViewVideos extends AllVideoShareView {
 		
 		$type_options[] = JHTML::_('select.option', 'url', JText::_('DIRECT_URL'));
 		$type_options[] = JHTML::_('select.option', 'upload', JText::_('GENERAL_UPLOAD'));
+		$type_options[] = JHTML::_('select.option', 'cdn_upload', JText::_('CDN_UPLOAD'));
 		$type_options[] = JHTML::_('select.option', 'youtube', JText::_('YOUTUBE'));
 		$type_options[] = JHTML::_('select.option', 'rtmp', JText::_('RTMP_STREAMING'));
 		$type_options[] = JHTML::_('select.option', 'lighttpd', JText::_('LIGHTTPD'));
@@ -77,8 +78,11 @@ class AllVideoShareViewVideos extends AllVideoShareView {
 		$type = JHTML::_('select.genericlist', $type_options, 'type', 'onchange="javascript:changeType(this.options[this.selectedIndex].value);"', 'value', 'text', '');
 		$this->assignRef('type', $type);
 		
+		$cdn = $model->getcdn();
+		$this->assignRef('cdn', $cdn);
+		
 		$category_options[] = JHTML::_('select.option', '', JText::_('SELECT_A_CATEGORY'));
-		$categories = $model->getcategories();		 
+		$categories = $model->getcategories();
 		foreach ( $categories as $item ) {
 			$item->treename = JString::str_ireplace('&#160;', '-', $item->treename);
 			$category_options[] = JHTML::_('select.option', $item->name, $item->treename );
