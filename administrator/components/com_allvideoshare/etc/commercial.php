@@ -14,12 +14,12 @@ class AllVideoShareCommercial {
 	public static function getLicenseKey()
 	{
 		$host = preg_replace('#^.*?([^.]+\.[^.]+)$#', '$1', $_SERVER['HTTP_HOST']);
-		
 		$charInputBit = 16;
+		
 		return self::_bin_to_hex(self::_sha1_convert(self::_string_to_bin($host, $charInputBit), (strlen($host) * $charInputBit)));
 	}
 
-	private function _sha1_convert($_arg1, $_arg2)
+	private static function _sha1_convert($_arg1, $_arg2)
 	{
 		$_local3 = 1732584193;
 		$_local4 = -271733879;
@@ -43,26 +43,27 @@ class AllVideoShareCommercial {
 				} else {
 					$_local8[$_local15] = self::_rol((((self::_arrayGetFromIndex($_local8, ($_local15 - 3)) ^ self::_arrayGetFromIndex($_local8, ($_local15 - 8))) ^ self::_arrayGetFromIndex($_local8, ($_local15 - 14))) ^ self::_arrayGetFromIndex($_local8, ($_local15 - 16))), 1);
 				}
-				$_local16 = self::_safe_add(self::_safe_add(self::_rol($_local3, 5), self::_sha_f_mod($_local15, $_local4, $_local5, $_local6)), self::_safe_add(self::_safe_add($_local7, self::_arrayGetFromIndex($_local8, $_local15)), self::_sha_z_mod($_local15)));
+				
+				$_local16 = self::_safe_add(self::_safe_add(self::_rol($_local3, 5), self::_sha_f_mod($_local15, $_local4, $_local5, $_local6)), self::_safe_add_string(decbin(self::_safe_add($_local7, self::_arrayGetFromIndex($_local8, $_local15))), self::_sha_z_mod($_local15)));
 				$_local7 = $_local6;
 				$_local6 = $_local5;
 				$_local5 = self::_rol($_local4, 30);
 				$_local4 = $_local3;
 				$_local3 = $_local16;
 				$_local15--;
+				
+				$_local3 = self::_safe_add($_local3, $_local10);
+				$_local4 = self::_safe_add($_local4, $_local11);
+				$_local5 = self::_safe_add($_local5, $_local12);
+				$_local6 = self::_safe_add($_local6, $_local13);
+				$_local7 = self::_safe_add($_local7, $_local14);
+				$_local9 = $_local9 + 16;
 			}
-			$_local3 = self::_safe_add($_local3, $_local10);
-			$_local4 = self::_safe_add($_local4, $_local11);
-			$_local5 = self::_safe_add($_local5, $_local12);
-			$_local6 = self::_safe_add($_local6, $_local13);
-			$_local7 = self::_safe_add($_local7, $_local14);
-			$_local9 = $_local9 + 16;
-		}
 		
 		return array($_local3, $_local4, $_local5, $_local6, $_local7);
 	}
 	
-	private function _sha_f_mod($_arg1, $_arg2, $_arg3, $_arg4)
+	private static function _sha_f_mod($_arg1, $_arg2, $_arg3, $_arg4)
 	{
 		if ($_arg1 < 20) {
 			return (($_arg2 & $_arg3) | (~($_arg2) & $_arg4));
@@ -77,12 +78,12 @@ class AllVideoShareCommercial {
 		return (($_arg2 ^ $_arg3) ^ $_arg4);
 	}
 
-	private function _sha_z_mod($_arg1)
+	private static function _sha_z_mod($_arg1)
 	{
-		return (($_arg1 < 20)) ? 3241657089 : ((($_arg1 < 40)) ? 896720674235 : (($_arg1 < 60) ? -127380284654 : -1937452086));
+		return (($_arg1 < 20)) ? '11000001001101111100001100000001' : ((($_arg1 < 40)) ? '1101000011001000101101111001110110111011' : (($_arg1 < 60) ? '1111111111111111111111111110001001010111100010110001101100010010' : '1111111111111111111111111111111110001100100001001101001111001010'));
 	}
 
-	private function _safe_add($_arg1, $_arg2)
+	private static function _safe_add($_arg1, $_arg2)
 	{
 		$_local3 = (($_arg1 & 0xFFFF) + ($_arg2 & 0xFFFF));
 		$_local4 = ((self::_intval32bits($_arg1 >> 16) + self::_intval32bits($_arg2 >> 16)) + self::_intval32bits($_local3 >> 16));
@@ -90,22 +91,67 @@ class AllVideoShareCommercial {
 		return self::_intval32bits($_local4 << 16) | ($_local3 & 0xFFFF);
 	}
 	
-	private function _intval32bits($value)
+	private static function _safe_add_string($_arg1, $_arg2)
+	{	
+		if (strlen($_arg1) > 16) {
+			$_local5 = bindec(substr($_arg1, -16));
+		} else {
+			$_local5 = bindec($_arg1);
+		}
+		
+		if (strlen($_arg2) > 16) {
+			$_local6 = bindec(substr($_arg2, -16));
+		} else {
+			$_local6 = bindec($_arg2);
+		}
+	
+		$_local3 = ($_local5 & 0xFFFF) + ($_local6 & 0xFFFF);
+		
+		if (strlen($_arg1) == 64 and substr($_arg1, 0, 1) == '1') {
+			$_local5 = substr(str_repeat('1', 17).substr($_arg1, 1, strlen($_arg1) - 17), 32);
+			
+			for ($i = 0; $i < 32; $i++) {
+				$_local5[$i] = $_local5[$i] == '1' ? '0' : '1';
+			}
+
+			$_local5 = (bindec($_local5) + 1) * -1;
+		} else {
+			$_local5 = bindec(substr($_arg1, 0, strlen($_arg1) - 16));
+		}
+		
+		if (strlen($_arg2) == 64 and substr($_arg2, 0, 1) == '1') {
+			$_local6 = substr(str_repeat('1', 17).substr($_arg2, 1, strlen($_arg2) - 17), 32);
+			
+			for ($i = 0; $i < 32; $i++) {
+				$_local6[$i] = $_local6[$i] == '1' ? '0' : '1';
+			}
+
+			$_local6 = (bindec($_local6) + 1) * -1;
+		} else {
+			$_local6 = bindec(substr($_arg2, 0, strlen($_arg2) - 16));
+		}
+		
+		$_local4 = $_local5 + $_local6 + ($_local3 >> 16);
+		
+		return self::_intval32bits($_local4 << 16) | ($_local3 & 0xFFFF);
+	}
+	
+	private static function _intval32bits($value)
 	{
 		$value = ($value & 0xFFFFFFFF);
 		
 		if ($value & 0x80000000)
 			$value = -((~$value & 0xFFFFFFFF) + 1);
-		
+	
 		return $value;
 	}
 	
-	private function _rol($_arg1, $_arg2)
+	private static function _rol($_arg1, $_arg2)
 	{
 		return self::_intval32bits($_arg1 << $_arg2) | self::_intval32bits($_arg1 >> (32 - $_arg2));
 	}
 	
-	private function _string_to_bin($_arg1, $_charInputBit)
+	private static function _string_to_bin($_arg1, $_charInputBit)
 	{
 		$_local2 = array();
 		$_local3 = self::_intval32bits(1 << $_charInputBit) - 1;
@@ -118,12 +164,12 @@ class AllVideoShareCommercial {
 		return $_local2;
 	}
 	
-	private function _arrayGetFromIndex($arr, $index)
+	private static function _arrayGetFromIndex($arr, $index)
 	{
 		return isset($arr[$index]) ? $arr[$index] : 0;
 	}
 	
-	private function _bin_to_hex($_arg1)
+	private static function _bin_to_hex($_arg1)
 	{
 		$_local2 = 'rAs0t2uBv3wCx4yDz5E6F7G8H9IJaKbLcMdNeOfPgQhRiSjTkUlVmWnXoYpZq';
 		$_local3 = '';
