@@ -292,6 +292,22 @@ class AllVideoShareModelVideos extends AllVideoShareModel {
 		 return $cdn;
 	}
 	
+	function getcategoryslugs() {
+		 $db = JFactory::getDBO();
+		 $query = 'SELECT name, slug FROM #__allvideoshare_categories';
+		 $db->setQuery( $query );
+		 $lists = $db->loadAssocList();
+		 
+		 $categoryslugs = array();
+		 
+		 foreach ($lists as $list)
+		 {
+			$categoryslugs[$list['name']] = $list['slug'];
+		 }
+		 
+		 return base64_encode(json_encode($categoryslugs));
+	}
+	
 	function cancel() {
 		 $mainframe = JFactory::getApplication();
 		 

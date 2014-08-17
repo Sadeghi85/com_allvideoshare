@@ -80,6 +80,8 @@ class AllVideoShareViewVideos extends AllVideoShareView {
 		
 		$cdn = $model->getcdn();
 		$this->assignRef('cdn', $cdn);
+		$categoryslugs = $model->getcategoryslugs();
+		$this->assignRef('categoryslugs', $categoryslugs);
 		
 		$category_options[] = JHTML::_('select.option', '', JText::_('SELECT_A_CATEGORY'));
 		$categories = $model->getcategories();

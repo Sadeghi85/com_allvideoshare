@@ -84,7 +84,7 @@ defined('_JEXEC') or die('Restricted access');
         <td><input type="file" name="cdn_preview" maxlength="100" /></td>
       </tr>
 	  
-	  
+	  <input type="hidden" name="categoryslugs" value="<?php echo $this->categoryslugs; ?>">
 	  
 	  
 	  
