@@ -51,14 +51,15 @@ class AllVideoShareCommercial {
 				$_local4 = $_local3;
 				$_local3 = $_local16;
 				$_local15--;
-				
-				$_local3 = self::_safe_add($_local3, $_local10);
-				$_local4 = self::_safe_add($_local4, $_local11);
-				$_local5 = self::_safe_add($_local5, $_local12);
-				$_local6 = self::_safe_add($_local6, $_local13);
-				$_local7 = self::_safe_add($_local7, $_local14);
-				$_local9 = $_local9 + 16;
 			}
+			
+			$_local3 = self::_safe_add($_local3, $_local10);
+			$_local4 = self::_safe_add($_local4, $_local11);
+			$_local5 = self::_safe_add($_local5, $_local12);
+			$_local6 = self::_safe_add($_local6, $_local13);
+			$_local7 = self::_safe_add($_local7, $_local14);
+			$_local9 = $_local9 + 16;
+		}
 		
 		return array($_local3, $_local4, $_local5, $_local6, $_local7);
 	}
