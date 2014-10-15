@@ -15,6 +15,8 @@ defined('_JEXEC') or die('Restricted access');
 ?>
 
 <div id="avs">
+<div id="dim" style="display:none;z-index: 1000;background-color: #000;width: 100%;height: 100%;position: fixed;top: 0;left: 0;opacity: .5;text-align: center;"><img alt="" style="top: 50%;position: relative;" src="components/com_allvideoshare/assets/loading.gif" /></div>
+
   <form action="index.php" method="post" name="adminForm" id="adminForm" enctype="multipart/form-data">
   	<?php 
 		AllVideoShareFallback::startTabs();
@@ -208,15 +210,19 @@ function submitbutton(pressbutton){
 				}
 				else
 				{
+					document.getElementById('dim').style.display = "none";
 					alert('<?php echo JText::_( 'CDN_UPLOAD_FAILED', true); ?>');
 					return;
 				}
 				
 			  } else {
+				document.getElementById('dim').style.display = "none";
 				alert('<?php echo JText::_( 'CDN_UPLOAD_FAILED', true); ?>');
 				return;
 			  }
 			};
+			
+			document.getElementById('dim').style.display = "block";
 			// Send the Data.
 			xhr.send(formData);
 			 
